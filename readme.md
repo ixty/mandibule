@@ -4,6 +4,14 @@
 Mandibule is a program that allows to inject an ELF file into a remote process.
 
 Both static & dynamically linked programs can be targetted.
+Supported archs:
+
+- x86
+- x86_64
+- arm
+- aarch64
+
+Example usage: https://asciinema.org/a/KkOHP2Jef0E6wViPCglkXLRcV
 
 @ixty 2018
 
