@@ -132,7 +132,7 @@ int _pt_cancel_syscall(int pid)
 
     iov.iov_base = &sysnbr;
     iov.iov_len = sizeof(long);
-    if(ptrace(PTRACE_SETREGSET, pid, (void*)NT_ARM_SYSTEM_CALL, &iov) < 0)
+    if(_ptrace(PTRACE_SETREGSET, pid, (void*)NT_ARM_SYSTEM_CALL, &iov) < 0)
         _pt_fail("> PTRACE_SETREGSET NT_ARM_SYSTEM_CALL err\n");
 #else
     // nothing specific to do on x86 & amd64

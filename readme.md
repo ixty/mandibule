@@ -11,7 +11,7 @@ Both static & dynamically linked programs can be targetted.
 ## installation
 ```shell
 git clone https://github.com/ixty/mandibule
-make `uname -m`
+make
 ```
 
 
