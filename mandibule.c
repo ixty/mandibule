@@ -14,12 +14,12 @@
 #include <linux/unistd.h>
 
 // first function in generated code - returns its own address aligned to page size
-void * mandibule_beg(int aligned)
+unsigned long mandibule_beg(int aligned)
 {
     if(!aligned)
-        return mandibule_beg;
-    return mandibule_beg - ((unsigned long)mandibule_beg % 0x1000);
-};
+        return (unsigned long)mandibule_beg;
+    return (unsigned long)mandibule_beg - ((unsigned long)mandibule_beg % 0x1000);
+}
 
 // include minimal inline c runtime + support code
 #include "icrt.h"
@@ -29,20 +29,20 @@ void * mandibule_beg(int aligned)
 #include "shargs.h"
 
 // forward declarations
-void * mandibule_end(void);
-void main(unsigned long * sp);
+unsigned long mandibule_end(void);
+void _main(unsigned long * sp);
 void payload_loadelf(ashared_t * args);
 
 // small macro for print + exit
-#define error(s...) do { printf(s); _exit(1); } while(0)
+#define error(...) do { printf(__VA_ARGS__); _exit(1); } while(0)
 
 // define injected code entry point - which calls payload_main()
-INJ_ENTRY(payload_start, payload_main);
+INJ_ENTRY(payload_start, payload_main)
 
 // define injector entry point - which calls main()
 void _start(void)
 {
-    CALL_SP(main);
+    CALL_SP(_main);
 }
 
 // show program usage & exit
@@ -70,7 +70,7 @@ void usage(char * argv0, char * msg)
 }
 
 // injector main code
-void main(unsigned long * sp)
+void _main(unsigned long * sp)
 {
     // argument parsing stuff
     int             ac          = *sp;
@@ -78,8 +78,8 @@ void main(unsigned long * sp)
     ashared_t *     args        = NULL;
 
     // injection vars
-    void *          inj_addr    = mandibule_beg(1);
-    size_t          inj_size    = mandibule_end() - inj_addr;
+    void *          inj_addr    = (void*)mandibule_beg(1);
+    size_t          inj_size    = mandibule_end() - (unsigned long)inj_addr;
     size_t          inj_off     = (size_t)payload_start - (size_t)inj_addr;
     size_t          inj_opts    = mandibule_beg(0) - mandibule_beg(1);
     uint8_t *       inj_code    = malloc(inj_size);
@@ -116,12 +116,12 @@ void main(unsigned long * sp)
 void payload_loadelf(ashared_t * args)
 {
     char            pids[24];
-    char            path[256] = {};
+    char            path[256];
     uint8_t *       auxv_buf;
     size_t          auxv_len;
     char **         av;
     char **         env;
-    uint8_t         fakestack[4096 * 16] = {};
+    uint8_t         fakestack[4096 * 16];
     uint8_t *       stackptr = fakestack + sizeof(fakestack);
     unsigned long   eop;
     unsigned long   base_addr;
@@ -131,6 +131,7 @@ void payload_loadelf(ashared_t * args)
         return;
 
     // read auxv
+    memset(path, 0, sizeof(path));
     strlcat(path, "/proc/", sizeof(path));
     strlcat(path, pids,     sizeof(path));
     strlcat(path, "/auxv",  sizeof(path));
@@ -158,6 +159,7 @@ void payload_loadelf(ashared_t * args)
          error("> failed to load elf\n");
 
     // build a stack for loader entry
+    memset(fakestack, 0, sizeof(fakestack));
     stackptr = fake_stack(stackptr, args->count_arg, av, env, (unsigned long *)auxv_buf);
 
     // all done
@@ -187,9 +189,9 @@ void payload_main(void)
 }
 
 // must be the last function in the .c file
-void * mandibule_end(void)
+unsigned long mandibule_end(void)
 {
-    void * p = "-= end_rodata =-";
+    uint8_t * p = (uint8_t*)"-= end_rodata =-";
     p += 0x1000 - ((unsigned long)p % 0x1000);
-    return p;
+    return (unsigned long)p;
 }

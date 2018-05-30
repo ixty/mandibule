@@ -15,7 +15,7 @@
 void usage(char * argv0, char * msg);
 
 // small error macro
-#define _ashared_error(s...) do { printf(s); _exit(1); } while(0)
+#define _ashared_error(...) do { printf(__VA_ARGS__); _exit(1); } while(0)
 
 // shared arguments between injector & injectee
 typedef struct ashared_s
@@ -29,7 +29,7 @@ typedef struct ashared_s
     unsigned long   base_addr;      // address where we want to load binary in memory - 0 for auto
     int             count_arg;      // number of arguments
     int             count_env;      // number of env values
-    char            data[0];        // data where args & envs are stored, list of null terminated strings
+    char            data[];         // data where args & envs are stored, list of null terminated strings
 } ashared_t;
 
 // allocates memory & prepares structure

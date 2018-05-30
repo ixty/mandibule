@@ -10,6 +10,7 @@ CFLAGS 	+= -D_GNU_SOURCE -std=gnu99
 CFLAGS 	+= -static-libgcc -lgcc
 CFLAGS 	+= -I icrt/ -I code/
 CFLAGS 	+= -fno-common -fno-stack-protector -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables
+# CFLAGS  += -Wall -Werror -Wpedantic
 PORTABLE = -pie -fPIE -fno-builtin
 MACHINE  = $(shell uname -m)
 

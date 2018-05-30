@@ -45,9 +45,10 @@
 
 static inline uint8_t * fake_stack(uint8_t * sp, int ac, char ** av, char ** env, unsigned long * auxv)
 {
-    uint8_t *   env_ptrs[256]   = {};
-    int         env_max         = 0;
-    char *      av_0            = NULL;
+    uint8_t *   env_ptrs[256];
+    int         env_max = 0;
+    char *      av_0    = NULL;
+    memset(env_ptrs, 0, sizeof(env_ptrs));
 
     // align stack
     FSTACK_PUSH_STR(sp, "");
@@ -67,7 +68,7 @@ static inline uint8_t * fake_stack(uint8_t * sp, int ac, char ** av, char ** env
     // argv data
     for(int i=0; i<ac; i++)
         FSTACK_PUSH_STR(sp, av[ac - i - 1]);
-    av_0 = sp;
+    av_0 = (char*)sp;
 
     // auxv
     FSTACK_PUSH_AUXV(sp, auxv);

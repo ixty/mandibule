@@ -52,7 +52,7 @@
 // ======================================================================== //
 
 // error macro
-#define _pt_fail(msg...) do { printf(msg); return -1; } while(0)
+#define _pt_fail(...) do { printf(__VA_ARGS__); return -1; } while(0)
 
 // returns the first executable segment of a process
 int _pt_getxzone(pid_t pid, unsigned long * addr, size_t * size)
@@ -74,7 +74,7 @@ int _pt_read(int pid, void * addr, void * dst, size_t len)
 
     while(n < len)
     {
-        if( (r = _ptrace(PTRACE_PEEKTEXT, pid, addr + n, dst + n)) < 0)
+        if( (r = _ptrace(PTRACE_PEEKTEXT, pid, (uint8_t*)addr + n, (uint8_t*)dst + n)) < 0)
             _pt_fail("_pt_read error %d\n", r);
         n += sizeof(long);
     }
@@ -89,7 +89,7 @@ int _pt_write(int pid, void * addr, void * src, size_t len)
 
     while(n < len)
     {
-        if( (r = _ptrace(PTRACE_POKETEXT, pid, addr + n, (void*)*(long*)(src + n))) < 0)
+        if( (r = _ptrace(PTRACE_POKETEXT, pid, (uint8_t*)addr + n, (void*)*(long*)((uint8_t*)src + n))) < 0)
             _pt_fail("_pt_write error %d", r);
         n += sizeof(long);
     }
@@ -143,12 +143,15 @@ int _pt_cancel_syscall(int pid)
 // inject shellcode via ptrace into remote process
 int pt_inject(pid_t pid, uint8_t * sc_buf, size_t sc_len, size_t start_offset)
 {
-    struct REG_TYPE regs = {};
-    struct REG_TYPE regs_backup = {};
+    struct REG_TYPE regs;
+    struct REG_TYPE regs_backup;
     unsigned long   rvm_a = 0;
     size_t          rvm_l = sc_len;
     uint8_t *       mem_backup = NULL;
     int             s;
+
+    memset(&regs, 0, sizeof(regs));
+    memset(&regs_backup, 0, sizeof(regs_backup));
 
     // get executable section large enough for our injected code
     if(_pt_getxzone(pid, &rvm_a, &rvm_l) < 0)

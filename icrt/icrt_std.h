@@ -40,12 +40,12 @@ void memcpy(void *dst, void *src, unsigned int len)
 void * memmem(void * haystack, size_t n, void * needle, size_t m)
 {
     for(int i=0; i<n-m; i++)
-        if(!memcmp(haystack + i, needle, m))
-            return haystack + i;
+        if(!memcmp((uint8_t*)haystack + i, needle, m))
+            return (uint8_t*)haystack + i;
     return NULL;
 }
 
-int strlen(unsigned char * str)
+int strlen(char * str)
 {
     int n = 0;
     while(*str++)
@@ -53,7 +53,7 @@ int strlen(unsigned char * str)
     return n;
 }
 
-int strnlen(unsigned char * str, int maxlen)
+int strnlen(char * str, int maxlen)
 {
     int l = strlen(str);
     return l > maxlen ? maxlen : l;

@@ -164,34 +164,36 @@ static inline rettype sys_name(void)                                        \
 // define desired syscalls
 // ========================================================================== //
 
-_syscall0(SYS_getpid,   _getpid,    int);
+_syscall0(SYS_getpid,   _getpid,    int)
 
-_syscall1(SYS_exit,     _exit,      int,        int);
-_syscall1(SYS_close,    _close,     int,        int);
-_syscall1(SYS_brk,      _brk,       long,       unsigned long);
+_syscall1(SYS_exit,     __exit,     int,        int)
+void _exit(int c) { __exit(c); }
 
-_syscall2(SYS_munmap,   _munmap,    long,       char*, int);
+_syscall1(SYS_close,    _close,     int,        int)
+_syscall1(SYS_brk,      _brk,       long,       unsigned long)
 
-_syscall3(SYS_read,     _read,      ssize_t,    int, void *, size_t);
-_syscall3(SYS_write,    _write,     ssize_t,    int, const void *, size_t);
-_syscall3(SYS_lseek,    _lseek,     long,       int, long, int);
-_syscall3(SYS_mprotect, _mprotect,  long,       void*, long, int);
+_syscall2(SYS_munmap,   _munmap,    long,       char*, int)
+
+_syscall3(SYS_read,     _read,      ssize_t,    int, void *, size_t)
+_syscall3(SYS_write,    _write,     ssize_t,    int, const void *, size_t)
+_syscall3(SYS_lseek,    _lseek,     long,       int, long, int)
+_syscall3(SYS_mprotect, _mprotect,  long,       void*, long, int)
 
 #if __i386__ || __arm__ || __x86_64__
-_syscall3(SYS_open,     _open,      int,        char *, int, int);
+_syscall3(SYS_open,     _open,      int,        char *, int, int)
 #else
-_syscall4(SYS_openat,   _openat,    int,        int, char *, int, int);
+_syscall4(SYS_openat,   _openat,    int,        int, char *, int, int)
 #define AT_FDCWD        -100
 #define _open(a, b, c) _openat(AT_FDCWD, a, b, c)
 #endif
 
-_syscall4(SYS_ptrace,   _ptrace,    long,       int, int, void*, void*);
-_syscall4(SYS_wait4,    _wait4,     int,        int, int*, int, void*);
+_syscall4(SYS_ptrace,   _ptrace,    long,       int, int, void*, void*)
+_syscall4(SYS_wait4,    _wait4,     int,        int, int*, int, void*)
 
 #if __i386__ || __arm__
-    _syscall6(SYS_mmap2, _mmap, void *, void *, long, int, int, int, long);
+    _syscall6(SYS_mmap2, _mmap, void *, void *, long, int, int, int, long)
 #else
-    _syscall6(SYS_mmap, _mmap, void *, void *, long, int, int, int, long);
+    _syscall6(SYS_mmap, _mmap, void *, void *, long, int, int, int, long)
 #endif
 
 

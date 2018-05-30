@@ -84,7 +84,7 @@ exit:
 
 int get_memmaps(int pid, uint8_t ** maps_buf, size_t * maps_len)
 {
-    char path[256] = {};
+    char path[256];
     char pids[24];
 
     // convert pid to string
@@ -92,6 +92,7 @@ int get_memmaps(int pid, uint8_t ** maps_buf, size_t * maps_len)
         return -1;
 
     // build /proc/pid/maps string
+    memset(path, 0, sizeof(path));
     strlcat(path, "/proc/", sizeof(path));
     strlcat(path, pids, sizeof(path));
     strlcat(path, "/maps", sizeof(path));
@@ -157,11 +158,17 @@ unsigned long get_mapmax(int pid)
     // parse all maps
     for(p = (char*)maps_buf; p >= maps_buf && p < maps_buf + maps_len; )
     {
-        char * endline = memmem(p, maps_len - (p - maps_buf), "\n", 1);
-        char * tmp;
-        unsigned long s = strtoul(p, &tmp, 16); tmp ++;
-        unsigned long e = strtoul(tmp, NULL, 16);
-        unsigned long t = e;
+        char *          endline = memmem(p, maps_len - (p - maps_buf), "\n", 1);
+        char *          tmp     = NULL;
+        unsigned long   e;
+        unsigned long   t;
+
+        strtoul(p, &tmp, 16);
+        if(!tmp)
+            continue;
+        tmp ++;
+        e = strtoul(tmp, NULL, 16);
+        t = e;
 
         while(t > 0xff)
             t >>= 8;
