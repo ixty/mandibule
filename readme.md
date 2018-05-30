@@ -138,4 +138,4 @@ In the remote process, mandibule does the following:
 - __arm64__:    Linux buildroot 4.13.6 #1 SMP Sat Mar 3 16:40:18 UTC 2018 aarch64 GNU/Linux
 - __arm__:      Linux buildroot 4.11.3 #1 SMP Sun Mar 4 02:36:56 UTC 2018 armv7l GNU/Linux
 
-arm & arm64 where tested using [arm_now](https://github.com/nongiach/arm_now) to easily spawn qemu vms with the desired arch.
+arm & arm64 where tested using [arm_now](https://github.com/nongiach/arm_now) by [@chaignc](https://twitter.com/chaignc) to easily spawn qemu vms with the desired arch.
