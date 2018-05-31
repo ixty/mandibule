@@ -27,16 +27,21 @@
     #define _syscall_do(sys_nbr, rettype)                                   \
     {                                                                       \
         rettype ret = 0;                                                    \
+        register int r0 asm ("ebx") = (int)a1;                              \
+        register int r1 asm ("ecx") = (int)a2;                              \
+        register int r2 asm ("edx") = (int)a3;                              \
+        register int r3 asm ("esi") = (int)a4;                              \
+        register int r4 asm ("edi") = (int)a5;                              \
+        register int r5 asm ("ebp") = (int)a6;                              \
+        register int r7 asm ("eax") = sys_nbr;                              \
         asm volatile                                                        \
         (                                                                   \
             "int $0x80;"                                                    \
-            : "=a" (ret)                                                    \
-            : "0"(sys_nbr), "bx"(a1), "cx"(a2),                             \
-              "dx"(a3),     "S"(a4),  "D"(a5), "bp"(a6)                     \
+            : "=r" (ret)                                                    \
+            : "r"(r7), "r"(r0), "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5) \
         );                                                                  \
         return ret;                                                         \
     }
-
 
 // x86_64 aka amd64
 #elif __x86_64__
